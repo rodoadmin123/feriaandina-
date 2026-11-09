@@ -35,7 +35,7 @@ cd backend && python manage.py runserver 8000
 cd frontend && npm run dev -- --port 5173
 ```
 Comprueba: `http://localhost:8000/api/productos/` devuelve JSON y `http://localhost:5173` muestra el catálogo.
-Si tocaste datos de prueba: `python manage.py cargar_demo` reinicia artesanos y productos.
+`python manage.py cargar_demo` solo carga si la base está vacía. Para volver a los datos iniciales: `python manage.py cargar_demo --reiniciar` (**borra todo**; nunca lo uses en el servidor compartido sin avisar al equipo).
 
 ## 4. Capturas en tamaño celular
 
@@ -45,7 +45,7 @@ python .claude/skills/ejecutar-y-verificar/scripts/capturas.py --salida capturas
 ```
 Recorre el flujo del plan y guarda PNG numerados en 390 × 844 @2x:
 `01_catalogo` · `02_catalogo_filtro` · `03_detalle` · `04_carrito` · `05_pago_ok` · `06_vender_vacio` · `07_vender_error` · `08_vender_lleno` · `09_publicado` · `10_catalogo_nuevo` · `11_api`.
-Al final imprime el stock antes y después del pago, que debe bajar. Ejecuta `cargar_demo` antes, para partir de datos limpios.
+Al final imprime el stock antes y después del pago, que debe bajar. En local, ejecuta antes `cargar_demo --reiniciar` para partir de datos limpios. Para probar el modo servidor en local usa `--front http://localhost:8000 --api http://localhost:8000` (ver sección 6).
 
 **Revisa las capturas** (ábrelas): barra inferior sin tapar contenido, botón principal visible, textos sin cortes, errores en rojo legibles.
 
@@ -54,3 +54,14 @@ Al final imprime el stock antes y después del pago, que debe bajar. Ejecuta `ca
 - Usa las capturas de la carpeta de salida y describe cada ventana con: objetivo, elementos, integración (endpoint) y paso del proceso del IDL1.
 - Aclara en el informe que los datos son de prueba ficticios.
 - Las capturas propias de quien entrega, tomadas en su PC o celular, valen más como evidencia que las generadas por un agente.
+
+## 6. Modo servidor (como en Render) en local
+
+```bash
+cd frontend && npm run build && rm -rf ../backend/frontend_dist && cp -r dist ../backend/frontend_dist
+cd ../backend
+DEBUG=0 SECRET_KEY=local python manage.py collectstatic --noinput
+DEBUG=0 SECRET_KEY=local gunicorn config.wsgi:application --bind 127.0.0.1:8000
+```
+Todo queda en un solo puerto: React en `/`, API en `/api/`, panel en `/admin/`.
+Despliegue real: `render.yaml` + `Dockerfile` + `iniciar.sh` (ver README, sección «Publicar en internet»).

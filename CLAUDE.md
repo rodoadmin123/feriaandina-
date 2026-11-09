@@ -25,12 +25,14 @@ Marketplace de artesanos del Valle del Mantaro. Prototipo **Django 5.2 + DRF** (
 - **Errores de negocio:** se lanzan como `ErrorDeDominio` y la API responde `400 {"error": "mensaje claro"}`.
 - **Front-end por dominio:** `frontend/src/dominios/<contexto>/{api.js,componentes/,paginas/}`; lo reutilizable va en `frontend/src/compartido/`.
 - **Datos:** los artesanos y productos de `cargar_demo` son ficticios; nunca uses datos personales reales.
+- **Servidor compartido (Render):** la base de datos es del equipo. Nunca ejecutes `--reiniciar`, borres datos ni cambies variables de entorno sin pedirlo el usuario. Las claves (Cloudinary, admin) van en el panel de Render, jamás en el código.
 
 ## Comandos rápidos
 
 ```bash
 # back-end
 cd backend && python manage.py migrate && python manage.py cargar_demo && python manage.py runserver
+python manage.py cargar_demo --reiniciar   # borra y recarga los 30 productos demo (solo en local)
 python manage.py test
 python ../.claude/skills/backend-ddd/scripts/revisar_capas.py
 # front-end

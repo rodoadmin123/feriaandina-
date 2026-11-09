@@ -16,3 +16,7 @@ dist/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Despliegue (generados al compilar)
+backend/staticfiles/
+backend/frontend_dist/

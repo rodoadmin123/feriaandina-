@@ -20,7 +20,8 @@ Condición de Andrea: *«los artesanos deben poder subir sus productos desde el 
 | Notificaciones | **WhatsApp Business Cloud API** + Firebase Cloud Messaging | IDL1 §3 |
 | Mapas / envío | **Google Maps Platform** | IDL1 §3 |
 | Facturación | **Nubefact** (OSE/PSE → SUNAT) | IDL1 §3 |
-| Imágenes | **Cloudinary** (prototipo: carpeta `media/`) | IDL1 §3 |
+| Imágenes | **Cloudinary** en el servidor (en local: carpeta `media/`) | IDL1 §3 |
+| Servidor | **Render** (Docker + PostgreSQL gratis) | Registro de decisiones |
 
 **Prohibido sin decisión registrada:** cambiar de framework (Laravel, Express, Spring, Vue, Flutter, Next.js…), agregar librerías de UI (Tailwind, MUI, Bootstrap…), gestores de estado (Redux, Zustand…), ORMs alternativos o una base de datos distinta.
 
@@ -79,3 +80,5 @@ Una historia está terminada solo si:
 |---|---|---|
 | 2026-10 | Django + PostgreSQL + servicios externos (IDL1) | Equipo domina Python; reutilizar APIs probadas |
 | 2026-11 | DDD con 3 contextos; React como front-end (IDL2) | Sin instalación para el artesano; componentes reutilizables |
+| 2026-11 | Publicar el prototipo en **Render** (Docker, plan gratis) con PostgreSQL y fotos en **Cloudinary**; Django sirve también React compilado (un solo enlace) | Que todo el equipo vea y cargue datos en la misma base. Usa las tecnologías ya previstas en §2 |
+| 2026-11 | Catálogo de demostración: 10 artesanos y 30 productos **ficticios** (`cargar_demo`, solo carga si la base está vacía) | Mostrar la interfaz con datos variados sin borrar lo que suba el equipo |
