@@ -1,0 +1,30 @@
+# Blueprint de Render: crea la app web y la base PostgreSQL con un clic.
+# Documentacion: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: feriaandina
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/categorias/
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: feriaandina-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "0"
+      - key: CLOUDINARY_URL          # se pega desde el panel de Cloudinary
+        sync: false
+      - key: DJANGO_ADMIN_USUARIO    # usuario del panel /admin/
+        sync: false
+      - key: DJANGO_ADMIN_CLAVE      # contrasena del panel /admin/
+        sync: false
+
+databases:
+  - name: feriaandina-db
+    plan: free
+    databaseName: feriaandina
+    user: feriaandina

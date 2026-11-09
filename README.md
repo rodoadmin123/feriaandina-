@@ -37,6 +37,18 @@ npm run dev
 ```
 App: http://localhost:5173
 
+## Publicar en internet (Render + Cloudinary)
+
+Así todo el equipo ve y carga datos en **la misma** aplicación.
+
+1. **Cloudinary** (fotos): crea una cuenta gratis en cloudinary.com y copia la **API environment variable** del panel (`cloudinary://...`).
+2. **Render**: crea una cuenta en render.com con tu GitHub → **New → Blueprint** → elige este repositorio. Render lee `render.yaml` y crea la web + PostgreSQL.
+3. Cuando lo pida, completa: `CLOUDINARY_URL` (lo del paso 1), `DJANGO_ADMIN_USUARIO` y `DJANGO_ADMIN_CLAVE` (tu usuario del panel `/admin/`).
+4. Espera el despliegue (5–10 min). El enlace queda como `https://feriaandina-xxxx.onrender.com`.
+
+Al arrancar, el servidor migra la base, carga los 30 productos demo **solo si está vacía** y crea el administrador.
+Plan gratis: se duerme tras 15 min sin uso (tarda ~1 min en despertar) y la base PostgreSQL gratuita vence a los 30 días.
+
 ## Endpoints
 
 | Método | Ruta | Qué hace |

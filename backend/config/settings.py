@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,13 +22,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-%7s(+f0(b1!m*el4=jq=6&v7+-y#4=p7t6jyy8^gpx(%b8ke84"
+# ---------------------------------------------------------------
+# Entorno: en tu PC no hace falta configurar nada (modo desarrollo).
+# En el servidor (Render) estas variables se definen en el panel.
+# ---------------------------------------------------------------
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-solo-para-desarrollo-local-feriaandina")
+DEBUG = os.environ.get("DEBUG", "1") == "1"
 
-# SECURITY WARNING: don"t run with debug turned on in production!
-DEBUG = True
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
+CSRF_TRUSTED_ORIGINS = []
+# Render informa el dominio publico del servicio en esta variable
+RENDER_HOST = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_HOST:
+    ALLOWED_HOSTS.append(RENDER_HOST)
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_HOST}")
+if DEBUG:
+    ALLOWED_HOSTS.append("*")  # permite abrirlo desde el celular en la misma red
 
-ALLOWED_HOSTS = []
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 # Application definition
@@ -48,6 +66,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # sirve estaticos y React en el servidor
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -80,11 +99,10 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# Sin DATABASE_URL usa SQLite (tu PC). En Render, DATABASE_URL apunta a PostgreSQL.
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}", conn_max_age=600)
 }
 
 
@@ -123,6 +141,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Version compilada de React (npm run build) que Django sirve en el servidor
+FRONTEND_DIST = BASE_DIR / "frontend_dist"
+WHITENOISE_ROOT = FRONTEND_DIST if FRONTEND_DIST.exists() else None
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -132,9 +155,24 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ---------------------------------------------------------------
 # Configuracion propia de FeriaAndina
 # ---------------------------------------------------------------
-# Fotos que suben los artesanos (en produccion: Cloudinary)
+# Fotos que suben los artesanos.
+# - En tu PC: carpeta backend/media/
+# - En el servidor: Cloudinary (si existe la variable CLOUDINARY_URL), porque
+#   el disco de Render gratis se borra en cada reinicio.
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+USA_CLOUDINARY = bool(os.environ.get("CLOUDINARY_URL"))
+
+STORAGES = {
+    "default": {
+        "BACKEND": ("config.almacenamiento.AlmacenamientoCloudinary" if USA_CLOUDINARY
+                    else "django.core.files.storage.FileSystemStorage"),
+    },
+    "staticfiles": {
+        "BACKEND": ("django.contrib.staticfiles.storage.StaticFilesStorage" if DEBUG
+                    else "whitenoise.storage.CompressedManifestStaticFilesStorage"),
+    },
+}
 
 # Direcciones del front-end React que pueden consumir la API
 CORS_ALLOWED_ORIGINS = [
